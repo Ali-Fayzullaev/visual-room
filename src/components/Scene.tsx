@@ -1,11 +1,11 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import RoomModel from "@/components/RoomModel";
 import Hotspot from "@/components/Hotspot";
-import { HOTSPOTS, type RoomState } from "@/lib/config";
+import { HOTSPOTS, MODEL_SCALE, MODEL_POSITION, type RoomState } from "@/lib/config";
 
 interface SceneProps {
   state: RoomState;
@@ -23,6 +23,15 @@ function isWebGLAvailable(): boolean {
   } catch {
     return false;
   }
+}
+
+/** Настройка сцены */
+function SceneSetup() {
+  const { gl } = useThree();
+  useEffect(() => {
+    gl.toneMappingExposure = 1.0;
+  }, [gl]);
+  return null;
 }
 
 export default function Scene({ state, activeHotspot, onHotspotClick }: SceneProps) {
@@ -49,47 +58,51 @@ export default function Scene({ state, activeHotspot, onHotspotClick }: ScenePro
       </div>
     );
   }
+
   return (
     <Canvas
       shadows
-      camera={{ position: [5, 4, 6], fov: 50 }}
+      camera={{ position: [5, 3.5, 6], fov: 45 }}
       className="!absolute inset-0"
       gl={{ antialias: true, toneMapping: 3 }}
     >
+      <SceneSetup />
+
+      {/* Освещение без внешних HDR */}
       <ambientLight intensity={0.5} />
       <directionalLight
         position={[5, 8, 5]}
-        intensity={1.5}
+        intensity={1.0}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
-      <pointLight position={[0, 4, 0]} intensity={0.8} color="#fff5e6" />
-      <hemisphereLight intensity={0.4} color="#ffffff" groundColor="#444444" />
-
-      <Environment preset="apartment" />
+      <directionalLight position={[-3, 5, -3]} intensity={0.3} />
+      <hemisphereLight intensity={0.4} color="#ffffff" groundColor="#8d7c6b" />
 
       <Suspense fallback={null}>
         <RoomModel state={state} />
       </Suspense>
 
-      {/* Hotspot-кнопки */}
-      {HOTSPOTS.map((hs) => (
-        <Hotspot
-          key={hs.id}
-          hotspot={hs}
-          isActive={activeHotspot === hs.id}
-          onClick={() => onHotspotClick(hs.id)}
-        />
-      ))}
+      {/* Hotspot-кнопки — в той же системе координат, что и модель */}
+      <group position={MODEL_POSITION} scale={MODEL_SCALE}>
+        {HOTSPOTS.map((hs) => (
+          <Hotspot
+            key={hs.id}
+            hotspot={hs}
+            isActive={activeHotspot === hs.id}
+            onClick={() => onHotspotClick(hs.id)}
+          />
+        ))}
+      </group>
 
       <OrbitControls
         makeDefault
         minDistance={3}
-        maxDistance={14}
-        minPolarAngle={0.2}
+        maxDistance={12}
+        minPolarAngle={0.3}
         maxPolarAngle={Math.PI / 2 - 0.05}
-        target={[0, 1, 0]}
+        target={[1.5, 1.2, 0]}
         enableDamping
         dampingFactor={0.05}
       />

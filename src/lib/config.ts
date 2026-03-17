@@ -13,7 +13,7 @@ export interface Variant {
 export interface HotspotConfig {
   id: string;
   label: string;
-  /** Позиция кнопки в 3D-сцене [x, y, z] */
+  /** Позиция кнопки в локальных координатах модели [x, y, z] */
   position: [number, number, number];
   /** Имена материалов в GLTF-модели, которые меняются */
   materialNames: string[];
@@ -22,10 +22,14 @@ export interface HotspotConfig {
 
 // === Варианты для каждого элемента ===
 
-const WALL_VARIANTS: Variant[] = [
+/** Комната (Structure_Windows) — стены + пол + потолок + окна — один материал */
+const ROOM_VARIANTS: Variant[] = [
+  { name: "Оригинал", type: "color", value: "", preview: "#e8e0d4" },
   { name: "Белый", type: "color", value: "#f5f5f5", preview: "#f5f5f5" },
   { name: "Бежевый", type: "color", value: "#f0e6d3", preview: "#f0e6d3" },
   { name: "Серый", type: "color", value: "#c0c0c0", preview: "#c0c0c0" },
+  { name: "Голубой", type: "color", value: "#ccdde8", preview: "#ccdde8" },
+  { name: "Мятный", type: "color", value: "#d4e8d0", preview: "#d4e8d0" },
   { name: "Обои 1", type: "texture", value: "/textures/walls/imgi_12_8811984814110.png", preview: "/textures/walls/imgi_12_8811984814110.png" },
   { name: "Обои 2", type: "texture", value: "/textures/walls/imgi_32_8802495791134.png", preview: "/textures/walls/imgi_32_8802495791134.png" },
   { name: "Обои 3", type: "texture", value: "/textures/walls/imgi_35_8812769542174.png", preview: "/textures/walls/imgi_35_8812769542174.png" },
@@ -34,24 +38,15 @@ const WALL_VARIANTS: Variant[] = [
   { name: "Обои 6", type: "texture", value: "/textures/walls/imgi_43_8802538258462.png", preview: "/textures/walls/imgi_43_8802538258462.png" },
 ];
 
-const CEILING_VARIANTS: Variant[] = [
-  { name: "Белый", type: "color", value: "#ffffff", preview: "#ffffff" },
-  { name: "Светло-серый", type: "color", value: "#e8e8e8", preview: "#e8e8e8" },
-  { name: "Кремовый", type: "color", value: "#fdf5e6", preview: "#fdf5e6" },
-  { name: "Потолок 1", type: "texture", value: "/textures/ceiling/imgi_12_8811984814110.png", preview: "/textures/ceiling/imgi_12_8811984814110.png" },
-  { name: "Потолок 2", type: "texture", value: "/textures/ceiling/imgi_32_8802495791134.png", preview: "/textures/ceiling/imgi_32_8802495791134.png" },
-  { name: "Потолок 3", type: "texture", value: "/textures/ceiling/imgi_35_8812769542174.png", preview: "/textures/ceiling/imgi_35_8812769542174.png" },
-  { name: "Потолок 4", type: "texture", value: "/textures/ceiling/imgi_37_8811985338398.png", preview: "/textures/ceiling/imgi_37_8811985338398.png" },
-  { name: "Потолок 5", type: "texture", value: "/textures/ceiling/imgi_39_8812008341534.png", preview: "/textures/ceiling/imgi_39_8812008341534.png" },
-  { name: "Потолок 6", type: "texture", value: "/textures/ceiling/imgi_43_8802538258462.png", preview: "/textures/ceiling/imgi_43_8802538258462.png" },
-];
-
-const FLOOR_VARIANTS: Variant[] = [
-  { name: "Паркет 1", type: "texture", value: "/textures/floor/imgi_13_8812331991070.png", preview: "/textures/floor/imgi_13_8812331991070.png" },
-  { name: "Паркет 2", type: "texture", value: "/textures/floor/imgi_15_8804478484510.png", preview: "/textures/floor/imgi_15_8804478484510.png" },
-  { name: "Плитка", type: "texture", value: "/textures/floor/imgi_17_8804477567006.png", preview: "/textures/floor/imgi_17_8804477567006.png" },
-  { name: "Ламинат 1", type: "texture", value: "/textures/floor/imgi_6_8804494802974.png", preview: "/textures/floor/imgi_6_8804494802974.png" },
-  { name: "Ламинат 2", type: "texture", value: "/textures/floor/imgi_9_8804476518430.png", preview: "/textures/floor/imgi_9_8804476518430.png" },
+/** Фоновая стена (Backdrop) — декоративная стена за ТВ */
+const BACKDROP_VARIANTS: Variant[] = [
+  { name: "Оригинал", type: "color", value: "", preview: "#9b8b7a" },
+  { name: "Тёмный", type: "color", value: "#3a3a3a", preview: "#3a3a3a" },
+  { name: "Белый", type: "color", value: "#f0f0f0", preview: "#f0f0f0" },
+  { name: "Бежевый", type: "color", value: "#d4bc96", preview: "#d4bc96" },
+  { name: "Серый", type: "color", value: "#8a8a8a", preview: "#8a8a8a" },
+  { name: "Синий", type: "color", value: "#4a6580", preview: "#4a6580" },
+  { name: "Зелёный", type: "color", value: "#5a7a5a", preview: "#5a7a5a" },
 ];
 
 const SOFA_VARIANTS: Variant[] = [
@@ -70,41 +65,49 @@ const CARPET_VARIANTS: Variant[] = [
   { name: "Тёмный", type: "color", value: "#4a4a4a", preview: "#4a4a4a" },
 ];
 
-// === Hotspot-ы ===
+// === Трансформация модели (используется и для модели, и для hotspot-ов) ===
+export const MODEL_SCALE = 1.5;
+export const MODEL_POSITION: [number, number, number] = [1.5, 0, 0];
+
+// === Hotspot-ы (позиции в ЛОКАЛЬНЫХ координатах модели) ===
+//
+// Карта материалов GLTF:
+//   Structure_Windows  → стены + пол + потолок + окна (один меш)
+//   Backdrop           → декоративная стена за ТВ
+//   Sofa               → диван
+//   Carpet             → ковёр (28 суб-мешей)
+//   Structure          → молдинги / отделка
+//   material_14        → ТВ-экран
+//   CoffeeTable        → журнальный столик
+//   Shelf              → полка
+//   Painting           → картина
 
 export const HOTSPOTS: HotspotConfig[] = [
   {
-    id: "walls",
-    label: "Стены",
-    position: [0, 2.5, -1.5],
+    id: "room",
+    label: "Комната",
+    position: [0.3, 1.8, -1.2],
+    materialNames: ["Structure_Windows"],
+    variants: ROOM_VARIANTS,
+  },
+  {
+    id: "backdrop",
+    label: "Фон стена",
+    position: [-0.2, 1.2, -1.4],
     materialNames: ["Backdrop"],
-    variants: WALL_VARIANTS,
-  },
-  {
-    id: "ceiling",
-    label: "Потолок",
-    position: [0, 3.8, 0],
-    materialNames: ["Structure"],
-    variants: CEILING_VARIANTS,
-  },
-  {
-    id: "floor",
-    label: "Пол",
-    position: [0, 0.1, 1.0],
-    materialNames: ["material_14"],
-    variants: FLOOR_VARIANTS,
+    variants: BACKDROP_VARIANTS,
   },
   {
     id: "sofa",
     label: "Диван",
-    position: [-1.0, 1.0, 1.5],
+    position: [-0.6, 0.6, 0.8],
     materialNames: ["Sofa"],
     variants: SOFA_VARIANTS,
   },
   {
     id: "carpet",
     label: "Ковёр",
-    position: [1.0, 0.1, 1.5],
+    position: [0.5, 0.05, 0.9],
     materialNames: ["Carpet"],
     variants: CARPET_VARIANTS,
   },

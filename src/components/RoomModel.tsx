@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import { useGLTF } from "@react-three/drei";
-import { type RoomState, HOTSPOTS } from "@/lib/config";
+import { type RoomState, HOTSPOTS, MODEL_SCALE, MODEL_POSITION } from "@/lib/config";
 import * as THREE from "three";
 
 interface RoomModelProps {
@@ -11,7 +11,7 @@ interface RoomModelProps {
 
 const MODEL_PATH = "/cozy_modern_living_room/scene.gltf";
 
-// Кеш загруженных текстур, чтобы не грузить одно и то же
+// Кеш загруженных текстур
 const textureCache = new Map<string, THREE.Texture>();
 const loader = new THREE.TextureLoader();
 
@@ -26,20 +26,63 @@ function loadTexture(path: string): THREE.Texture {
   return tex;
 }
 
+// Сохраняем оригинальные данные материала (map + emissiveMap + emissive)
+interface OriginalMaterialData {
+  map: THREE.Texture | null;
+  emissiveMap: THREE.Texture | null;
+  emissive: THREE.Color;
+}
+
 export default function RoomModel({ state }: RoomModelProps) {
   const { scene } = useGLTF(MODEL_PATH);
   const sceneRef = useRef(scene);
+  const clonedRef = useRef(false);
 
-  // Сохраняем оригинальные карты материалов
-  const originalsRef = useRef<Map<string, THREE.Texture | null>>(new Map());
+  // Оригинальные данные материалов
+  const originalsRef = useRef<Map<string, OriginalMaterialData>>(new Map());
 
-  // Собираем оригинальные текстуры при первом рендере
+  // Клонируем материалы при первом рендере, чтобы изменения применялись корректно
   useEffect(() => {
+    if (clonedRef.current) return;
+    clonedRef.current = true;
+
+    // Список имён материалов, которые мы будем менять
+    const targetNames = new Set<string>();
+    for (const hs of HOTSPOTS) {
+      for (const name of hs.materialNames) {
+        targetNames.add(name);
+      }
+    }
+
+    scene.traverse((child) => {
+      if (!(child instanceof THREE.Mesh) || !child.material) return;
+      const mat = child.material as THREE.MeshStandardMaterial;
+      if (!mat.name || !targetNames.has(mat.name)) return;
+
+      // Сохраняем оригинальные данные (map, emissiveMap, emissive)
+      if (!originalsRef.current.has(mat.name)) {
+        originalsRef.current.set(mat.name, {
+          map: mat.map ? mat.map.clone() : null,
+          emissiveMap: mat.emissiveMap ? mat.emissiveMap.clone() : null,
+          emissive: mat.emissive.clone(),
+        });
+      }
+
+      // Клонируем материал, чтобы каждый меш имел свою копию
+      const cloned = mat.clone();
+      cloned.name = mat.name;
+      child.material = cloned;
+    });
+
+    // Логируем имена для отладки
+    console.log("[RoomModel] Материалы модели:");
+    const names = new Set<string>();
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh && child.material) {
-        const mat = child.material as THREE.MeshStandardMaterial;
-        if (mat.name && !originalsRef.current.has(mat.name)) {
-          originalsRef.current.set(mat.name, mat.map ? mat.map.clone() : null);
+        const m = child.material as THREE.MeshStandardMaterial;
+        if (m.name && !names.has(m.name)) {
+          names.add(m.name);
+          console.log(`  - "${m.name}" emissive:`, m.emissive, "emissiveMap:", !!m.emissiveMap);
         }
       }
     });
@@ -55,7 +98,11 @@ export default function RoomModel({ state }: RoomModelProps) {
         if (!value || value === "") {
           // Вернуть оригинал
           const orig = originalsRef.current.get(mat.name);
-          mat.map = orig ?? null;
+          if (orig) {
+            mat.map = orig.map;
+            mat.emissiveMap = orig.emissiveMap;
+            mat.emissive.copy(orig.emissive);
+          }
           mat.color.set("#ffffff");
           mat.needsUpdate = true;
           return;
@@ -64,11 +111,16 @@ export default function RoomModel({ state }: RoomModelProps) {
         if (variantType === "texture") {
           const tex = loadTexture(value);
           mat.map = tex;
+          mat.emissiveMap = tex;
           mat.color.set("#ffffff");
+          mat.emissive.set("#ffffff");
           mat.needsUpdate = true;
         } else {
+          // Цвет — убираем текстуры и ставим цвет
           mat.map = null;
+          mat.emissiveMap = null;
           mat.color.set(value);
+          mat.emissive.set(value);
           mat.needsUpdate = true;
         }
       });
@@ -89,8 +141,8 @@ export default function RoomModel({ state }: RoomModelProps) {
     <primitive
       ref={sceneRef}
       object={scene}
-      scale={1.5}
-      position={[1.5, 0, 0]}
+      scale={MODEL_SCALE}
+      position={MODEL_POSITION}
       castShadow
       receiveShadow
     />

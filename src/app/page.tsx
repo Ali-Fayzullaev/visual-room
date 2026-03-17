@@ -12,7 +12,7 @@ function WebGLCheck({ children }: { children: React.ReactNode }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-full bg-gray-900 text-white">
+      <div className="flex flex-col items-center justify-center w-full h-full bg-gray-950 text-white">
         <p className="text-xl mb-4">WebGL недоступен</p>
         <p className="text-white/60 text-sm mb-6 text-center max-w-md">
           Закройте все вкладки браузера, перезапустите браузер и откройте эту страницу заново.
@@ -28,10 +28,7 @@ function WebGLCheck({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div
-      className="w-full h-full"
-      onError={() => setError(true)}
-    >
+    <div className="w-full h-full" onError={() => setError(true)}>
       {children}
     </div>
   );
@@ -58,14 +55,30 @@ export default function Home() {
     : null;
 
   return (
-    <main className="relative w-screen h-screen bg-gray-900">
+    <main className="relative w-screen h-screen bg-gray-950 overflow-hidden">
+      {/* Шапка */}
+      <header className="absolute top-0 left-0 right-0 z-30 pointer-events-none">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3 pointer-events-auto">
+            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-xl flex items-center justify-center">
+              <span className="text-white text-sm font-bold">3D</span>
+            </div>
+            <div>
+              <h1 className="text-white text-sm font-bold tracking-wide">Конфигуратор комнаты</h1>
+              <p className="text-white/40 text-[10px] tracking-wider">ИНТЕРАКТИВНЫЙ ДИЗАЙН</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* 3D Сцена */}
       <WebGLCheck>
         <Suspense
           fallback={
-            <div className="flex items-center justify-center w-full h-full bg-gray-900 text-white text-lg">
+            <div className="flex items-center justify-center w-full h-full bg-gray-950 text-white text-lg">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
-                Загрузка 3D сцены...
+                <div className="w-12 h-12 border-4 border-white/10 border-t-white rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-white/60 text-sm">Загрузка 3D сцены...</p>
               </div>
             </div>
           }
@@ -78,7 +91,7 @@ export default function Home() {
         </Suspense>
       </WebGLCheck>
 
-      {/* Панель вариантов при клике на hotspot */}
+      {/* Панель выбора материалов */}
       {activeConfig && (
         <MaterialPanel
           hotspot={activeConfig}
@@ -88,10 +101,12 @@ export default function Home() {
         />
       )}
 
-      {/* Подсказка */}
+      {/* Нижняя подсказка */}
       {!activeHotspot && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-sm text-white/60 text-sm px-4 py-2 rounded-full pointer-events-none">
-          Нажмите на точку ⊙ чтобы изменить элемент
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <div className="bg-black/50 backdrop-blur-xl text-white/60 text-xs px-5 py-2.5 rounded-full border border-white/[0.06]">
+            Нажмите на точку ● чтобы изменить элемент
+          </div>
         </div>
       )}
     </main>
