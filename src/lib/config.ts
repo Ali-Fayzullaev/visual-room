@@ -3,17 +3,24 @@ export interface ColorOption {
   value: string;
 }
 
+export interface WallpaperOption {
+  name: string;
+  value: string;
+  preview: string;
+}
+
 export interface RoomConfig {
-  wallColor: string;
+  wallTexture: string;
   floorColor: string;
   tableColor: string;
   chairColor: string;
 }
 
-export const WALL_COLORS: ColorOption[] = [
-  { name: "Белый", value: "#ffffff" },
-  { name: "Бежевый", value: "#f5e6ca" },
-  { name: "Серый", value: "#b0b0b0" },
+export const WALL_TEXTURES: WallpaperOption[] = [
+  { name: "Обои 1", value: "/img-fon/imgi_11_8802492776478.png", preview: "/img-fon/imgi_11_8802492776478.png" },
+  { name: "Обои 2", value: "/img-fon/imgi_12_8811984814110.png", preview: "/img-fon/imgi_12_8811984814110.png" },
+  { name: "Обои 3", value: "/img-fon/imgi_19_8812778782750.png", preview: "/img-fon/imgi_19_8812778782750.png" },
+  { name: "Обои 4", value: "/img-fon/imgi_25_8811986059294.png", preview: "/img-fon/imgi_25_8811986059294.png" },
 ];
 
 export const FLOOR_COLORS: ColorOption[] = [
@@ -35,7 +42,7 @@ export const CHAIR_COLORS: ColorOption[] = [
 ];
 
 export const DEFAULT_CONFIG: RoomConfig = {
-  wallColor: WALL_COLORS[0].value,
+  wallTexture: WALL_TEXTURES[0].value,
   floorColor: FLOOR_COLORS[0].value,
   tableColor: TABLE_COLORS[0].value,
   chairColor: CHAIR_COLORS[0].value,

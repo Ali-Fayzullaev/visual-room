@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Canvas } from "@react-three/fiber";
-import Room from "@/components/Room";
+import { useState, useCallback, Suspense } from "react";
+import dynamic from "next/dynamic";
 import ControlPanel from "@/components/ControlPanel";
 import { DEFAULT_CONFIG, type RoomConfig } from "@/lib/config";
+
+const Scene = dynamic(() => import("@/components/Scene"), { ssr: false });
 
 export default function Home() {
   const [config, setConfig] = useState<RoomConfig>(DEFAULT_CONFIG);
@@ -18,13 +19,15 @@ export default function Home() {
 
   return (
     <main className="relative w-screen h-screen">
-      <Canvas
-        shadows
-        camera={{ position: [6, 5, 6], fov: 50 }}
-        className="!absolute inset-0"
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center w-full h-full bg-gray-900 text-white text-lg">
+            Загрузка 3D сцены...
+          </div>
+        }
       >
-        <Room config={config} />
-      </Canvas>
+        <Scene config={config} />
+      </Suspense>
 
       <ControlPanel config={config} onChange={handleChange} />
     </main>

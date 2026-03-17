@@ -6,6 +6,11 @@ import Floor from "./Floor";
 import Table from "./Table";
 import Chair from "./Chair";
 import Window from "./Window";
+import Bookshelf from "./Bookshelf";
+import Lamp from "./Lamp";
+import Sofa from "./Sofa";
+import Painting from "./Painting";
+import Rug from "./Rug";
 import type { RoomConfig } from "@/lib/config";
 
 interface RoomProps {
@@ -34,13 +39,20 @@ export default function Room({ config }: RoomProps) {
       <Environment preset="apartment" />
 
       {/* Комната */}
-      <Walls color={config.wallColor} />
+      <Walls texturePath={config.wallTexture} />
       <Floor color={config.floorColor} />
 
       {/* Мебель */}
       <Table color={config.tableColor} />
       <Chair color={config.chairColor} />
       <Window />
+      <Bookshelf />
+      <Lamp />
+      <Sofa />
+
+      {/* Декор */}
+      <Painting />
+      <Rug />
 
       {/* Управление камерой */}
       <OrbitControls
