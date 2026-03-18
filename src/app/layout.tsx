@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "3D Конфигуратор комнаты",
-  description: "Настройте свою комнату в 3D",
+  title: "Конфигуратор комнаты",
+  description: "Настройте интерьер комнаты онлайн",
 };
 
 export default function RootLayout({

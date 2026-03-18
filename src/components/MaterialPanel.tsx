@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { HotspotConfig, Variant } from "@/lib/config";
+import type { ZoneConfig, Variant } from "@/lib/config";
 
 interface MaterialPanelProps {
-  hotspot: HotspotConfig;
+  zone: ZoneConfig;
   currentValue: string;
-  onSelect: (hotspotId: string, value: string) => void;
+  onSelect: (zoneId: string, value: string) => void;
   onClose: () => void;
 }
 
@@ -70,7 +70,7 @@ function VariantButton({
 }
 
 export default function MaterialPanel({
-  hotspot,
+  zone,
   currentValue,
   onSelect,
   onClose,
@@ -86,18 +86,22 @@ export default function MaterialPanel({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const colors = hotspot.variants.filter((v) => v.type === "color");
-  const textures = hotspot.variants.filter((v) => v.type === "texture");
+  const colors = zone.variants.filter((v) => v.type === "color");
+  const textures = zone.variants.filter((v) => v.type === "texture");
 
   return (
     <div
       ref={panelRef}
       className="
         fixed z-20
-        right-4 top-1/2 -translate-y-1/2
+        inset-x-0 bottom-0 sm:inset-x-auto sm:bottom-auto
+        sm:right-4 sm:top-1/2 sm:-translate-y-1/2
         bg-gradient-to-b from-gray-900/95 to-gray-950/95
-        backdrop-blur-2xl rounded-2xl
-        p-5 w-[280px]
+        backdrop-blur-2xl
+        rounded-t-2xl sm:rounded-2xl
+        p-4 sm:p-5
+        w-full sm:w-[280px]
+        max-h-[60vh] sm:max-h-[80vh] overflow-y-auto
         shadow-2xl shadow-black/50
         border border-white/[0.08]
         animate-in slide-in-from-right duration-300
@@ -109,7 +113,7 @@ export default function MaterialPanel({
           <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
           </div>
-          <h3 className="text-white font-bold text-sm tracking-wide">{hotspot.label}</h3>
+          <h3 className="text-white font-bold text-sm tracking-wide">{zone.label}</h3>
         </div>
         <button
           onClick={onClose}
@@ -134,7 +138,7 @@ export default function MaterialPanel({
                 key={v.value || "original"}
                 variant={v}
                 isSelected={currentValue === v.value}
-                onClick={() => onSelect(hotspot.id, v.value)}
+                onClick={() => onSelect(zone.id, v.value)}
               />
             ))}
           </div>
@@ -151,7 +155,7 @@ export default function MaterialPanel({
                 key={v.value}
                 variant={v}
                 isSelected={currentValue === v.value}
-                onClick={() => onSelect(hotspot.id, v.value)}
+                onClick={() => onSelect(zone.id, v.value)}
               />
             ))}
           </div>
