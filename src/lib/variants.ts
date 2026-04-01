@@ -54,3 +54,29 @@ export const FURNITURE_VARIANTS: Variant[] = [
   { name: "Бежевый", type: "color", value: "#c4a882", preview: "#c4a882" },
   { name: "Тёмный", type: "color", value: "#3a3a3a", preview: "#3a3a3a" },
 ];
+
+export const COUNTERTOP_VARIANTS: Variant[] = [
+  { name: "Оригинал", type: "color", value: "", preview: "#888888" },
+  { name: "Белый мрамор", type: "color", value: "#f0ece6", preview: "#f0ece6" },
+  { name: "Серый камень", type: "color", value: "#8c8c8c", preview: "#8c8c8c" },
+  { name: "Бежевый", type: "color", value: "#d4c4a8", preview: "#d4c4a8" },
+  { name: "Тёмный гранит", type: "color", value: "#2d2d2d", preview: "#2d2d2d" },
+  { name: "Дуб", type: "texture", value: "/textures/furniture/imgi_10_8811986518046.png", preview: "/textures/furniture/imgi_10_8811986518046.png" },
+  { name: "Орех", type: "texture", value: "/textures/furniture/imgi_9_8812767674398.png", preview: "/textures/furniture/imgi_9_8812767674398.png" },
+];
+
+export const CABINET_VARIANTS: Variant[] = [
+  { name: "Оригинал", type: "color", value: "", preview: "#252220" },
+  { name: "Белый", type: "color", value: "#f5f5f5", preview: "#f5f5f5" },
+  { name: "Бежевый", type: "color", value: "#e8dcc8", preview: "#e8dcc8" },
+  { name: "Серый", type: "color", value: "#8a8a8a", preview: "#8a8a8a" },
+  { name: "Тёмно-серый", type: "color", value: "#4a4a4a", preview: "#4a4a4a" },
+  { name: "Чёрный", type: "color", value: "#1a1a1a", preview: "#1a1a1a" },
+  { name: "Оливковый", type: "color", value: "#6b7a5a", preview: "#6b7a5a" },
+  { name: "Синий", type: "color", value: "#3a4a6a", preview: "#3a4a6a" },
+  { name: "Бордо", type: "color", value: "#6a2a3a", preview: "#6a2a3a" },
+  { name: "Дерево 1", type: "texture", value: "/textures/furniture/imgi_10_8811986518046.png", preview: "/textures/furniture/imgi_10_8811986518046.png" },
+  { name: "Дерево 2", type: "texture", value: "/textures/furniture/imgi_14_8812768460830.png", preview: "/textures/furniture/imgi_14_8812768460830.png" },
+  { name: "Дерево 3", type: "texture", value: "/textures/furniture/imgi_16_8812777209886.png", preview: "/textures/furniture/imgi_16_8812777209886.png" },
+  { name: "Дерево 4", type: "texture", value: "/textures/furniture/imgi_9_8812767674398.png", preview: "/textures/furniture/imgi_9_8812767674398.png" },
+];
