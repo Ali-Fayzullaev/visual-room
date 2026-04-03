@@ -26,6 +26,14 @@ const ROOMS = [
     zones: 6,
     badge: "3D",
   },
+  {
+    id: "kitchen-2",
+    name: "Кухня 2",
+    description: "Тестовая 3D-модель с быстрой сменой декора всей сцены",
+    preview: "/kitchen2.png",
+    zones: 1,
+    badge: "3D",
+  },
 ];
 
 export default function Home() {

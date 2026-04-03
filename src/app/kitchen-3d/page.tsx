@@ -30,68 +30,66 @@ const EggerViewer = dynamic(() => import("@/components/EggerViewer"), {
 });
 
 /* ── Kitchen 3D model configuration ── */
-const MODEL_PATH = "/kitchen-model/kitchen.glb";
+const MODEL_PATH = "/kitchen-model/kitchen-new.glb";
 
 const ZONES: Zone3DConfig[] = [
+  {
+    id: "floor",
+    label: "Пол",
+    icon: "floor",
+    materialNames: ["podloga"],
+    textureRepeat: [4, 4],
+    roughness: 0.3,
+    metalness: 0,
+    variants: FLOOR_VARIANTS,
+  },
+  {
+    id: "walls",
+    label: "Деревянная стена",
+    icon: "wall",
+    materialNames: ["sciana z drewna"],
+    textureRepeat: [3, 3],
+    roughness: 0.5,
+    metalness: 0,
+    variants: WALL_VARIANTS,
+  },
   {
     id: "cabinets",
     label: "Фасады шкафов",
     icon: "furniture",
-    materialNames: [
-      "kitchen_modern79_Material #2146930810",
-    ],
+    materialNames: ["Material.005", "Material.006", "Material.003", "Material.004"],
     textureRepeat: [3, 3],
-    roughness: 0.11,
+    roughness: 0.15,
     metalness: 0,
     variants: CABINET_VARIANTS,
   },
   {
-    id: "cabinet-body",
-    label: "Корпус мебели",
-    icon: "wall",
-    materialNames: [
-      "kitchen_modern79_Material #2146930811",
-    ],
+    id: "wood",
+    label: "Дерево / Мебель",
+    icon: "furniture",
+    materialNames: ["drewno1", "Material.001"],
     textureRepeat: [3, 3],
-    roughness: 0.4,
+    roughness: 0.5,
     metalness: 0,
-    variants: CABINET_VARIANTS,
+    variants: FURNITURE_VARIANTS,
   },
   {
     id: "countertop",
     label: "Столешница",
     icon: "countertop",
-    materialNames: [
-      "kitchen_modern79_stone_kit31",
-    ],
+    materialNames: ["Material.016", "Material.010"],
     textureRepeat: [2, 2],
     roughness: 0.1,
     metalness: 0,
     variants: COUNTERTOP_VARIANTS,
   },
   {
-    id: "backsplash",
-    label: "Фартук",
-    icon: "wall",
-    materialNames: [
-      "panel.001",
-    ],
-    textureRepeat: [4, 4],
-    roughness: 0.5,
-    metalness: 0.3,
-    variants: WALL_VARIANTS,
-  },
-  {
     id: "handles",
-    label: "Ручки / Хром",
+    label: "Ручки / Фурнитура",
     icon: "appliance",
-    materialNames: [
-      "kitchen_modern79_chorm02",
-      "chorom01.015",
-      "chorom01.014",
-    ],
+    materialNames: ["puleczki material", "faucet 1", "faucet 2"],
     textureRepeat: [1, 1],
-    roughness: 0.25,
+    roughness: 0.2,
     metalness: 0.9,
     variants: [
       { name: "Оригинал", type: "color", value: "", preview: "#888" },
@@ -101,11 +99,43 @@ const ZONES: Zone3DConfig[] = [
       { name: "Медь", type: "color", value: "#b87333", preview: "#b87333" },
     ],
   },
+  {
+    id: "appliances",
+    label: "Техника / Пластик",
+    icon: "appliance",
+    materialNames: ["Pmma Opaque Arctic", "Pmma Opaque Arctic2", "Material.009"],
+    textureRepeat: [1, 1],
+    roughness: 0.3,
+    metalness: 0,
+    variants: [
+      { name: "Оригинал", type: "color", value: "", preview: "#f0f0f0" },
+      { name: "Белый", type: "color", value: "#f5f5f5", preview: "#f5f5f5" },
+      { name: "Серый", type: "color", value: "#8a8a8a", preview: "#8a8a8a" },
+      { name: "Чёрный", type: "color", value: "#1a1a1a", preview: "#1a1a1a" },
+      { name: "Бежевый", type: "color", value: "#d4c4a8", preview: "#d4c4a8" },
+    ],
+  },
+  {
+    id: "porcelain",
+    label: "Керамика / Раковина",
+    icon: "countertop",
+    materialNames: ["Porcelain", "talerze"],
+    textureRepeat: [1, 1],
+    roughness: 0.15,
+    metalness: 0,
+    variants: [
+      { name: "Оригинал", type: "color", value: "", preview: "#f0ece6" },
+      { name: "Белый", type: "color", value: "#f5f5f5", preview: "#f5f5f5" },
+      { name: "Кремовый", type: "color", value: "#f0e6d0", preview: "#f0e6d0" },
+      { name: "Серый", type: "color", value: "#8a8a8a", preview: "#8a8a8a" },
+      { name: "Чёрный", type: "color", value: "#1a1a1a", preview: "#1a1a1a" },
+    ],
+  },
 ];
 
-/* Camera angle — fixed front view of the kitchen (pulled back to show full scene) */
-const CAMERA_POS: [number, number, number] = [0, 2.0, 5.8];
-const CAMERA_TARGET: [number, number, number] = [0, 0.8, 0];
+/* Camera: cm-scale, closer elevated 3/4 view */
+const CAMERA_POS: [number, number, number] = [-100, 180, 300];
+const CAMERA_TARGET: [number, number, number] = [-208, 0, -20];
 
 /* ═══════════════════════════════════ Page ═══════════════════════════════════ */
 
