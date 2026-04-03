@@ -247,6 +247,55 @@ function RoomModel({ modelPath, state, zones, onZoneClick, hoveredZone, onHoverZ
   );
 }
 
+/* ───── Auto-fit camera to loaded model ───── */
+function AutoCamera({ modelPath, cameraPos, cameraTarget }: {
+  modelPath: string;
+  cameraPos: [number, number, number];
+  cameraTarget: [number, number, number];
+}) {
+  const { camera } = useThree();
+  const gltf = useLoader(GLTFLoader, modelPath);
+  const fitted = useRef(false);
+
+  useEffect(() => {
+    if (fitted.current) return;
+    fitted.current = true;
+
+    // Compute bounding box of entire scene
+    const box = new THREE.Box3().setFromObject(gltf.scene);
+    if (!box.isEmpty()) {
+      const center = new THREE.Vector3();
+      const size = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(size);
+
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const fov = (camera as THREE.PerspectiveCamera).fov ?? 50;
+      const fovRad = (fov * Math.PI) / 180;
+      // Distance to fit the whole model
+      const dist = (maxDim / 2) / Math.tan(fovRad / 2) * 1.5;
+
+      // Position camera slightly above and in front of the model
+      camera.position.set(
+        center.x + dist * 0.4,
+        center.y + dist * 0.25,
+        center.z + dist * 0.85
+      );
+      camera.lookAt(center);
+      (camera as THREE.PerspectiveCamera).near = dist * 0.001;
+      (camera as THREE.PerspectiveCamera).far = dist * 20;
+      camera.updateProjectionMatrix();
+    } else {
+      // Fallback to provided values
+      camera.position.set(...cameraPos);
+      camera.lookAt(new THREE.Vector3(...cameraTarget));
+      camera.updateProjectionMatrix();
+    }
+  }, [gltf.scene, camera, cameraPos, cameraTarget]);
+
+  return null;
+}
+
 /* ───── Scene lighting ───── */
 function Scene({
   modelPath,
@@ -267,7 +316,7 @@ function Scene({
   hoveredZone: string | null;
   onHoverZone: (zoneId: string | null) => void;
 }) {
-  const { camera, gl } = useThree();
+  const { gl } = useThree();
 
   /* Auto-detect scale from camera distance */
   const scale = useMemo(() => {
@@ -277,12 +326,7 @@ function Scene({
 
   const [tx, ty, tz] = cameraTarget;
 
-  // Set camera and lock
-  useEffect(() => {
-    camera.position.set(...cameraPos);
-    camera.lookAt(new THREE.Vector3(...cameraTarget));
-    camera.updateProjectionMatrix();
-  }, [camera, cameraPos, cameraTarget]);
+  // Tone mapping only (camera handled by AutoCamera)
 
   // Tone mapping
   useEffect(() => {
@@ -375,6 +419,7 @@ interface EggerViewerProps {
   zones: Zone3DConfig[];
   cameraPos?: [number, number, number];
   cameraTarget?: [number, number, number];
+  fov?: number;
   activeZone: string | null;
   onZoneClick?: (zoneId: string) => void;
 }
@@ -385,6 +430,7 @@ export default function EggerViewer({
   zones,
   cameraPos = [0, 1.0, 3.2],
   cameraTarget = [0, 0.7, 0],
+  fov = 38,
   activeZone,
   onZoneClick,
 }: EggerViewerProps) {
@@ -403,7 +449,7 @@ export default function EggerViewer({
           outputColorSpace: THREE.SRGBColorSpace,
         }}
         camera={{
-          fov: 38,
+          fov,
           near: Math.max(0.1, Math.hypot(...cameraPos) * 0.001),
           far: Math.max(100, Math.hypot(...cameraPos) * 20),
           position: cameraPos,

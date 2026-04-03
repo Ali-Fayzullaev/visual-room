@@ -4,7 +4,12 @@ import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import VdsPanel from "@/components/VdsPanel";
 import type { Zone3DConfig, RoomState } from "@/lib/config";
-import { CABINET_VARIANTS } from "@/lib/variants";
+import {
+  WALL_VARIANTS,
+  FLOOR_VARIANTS,
+  FURNITURE_VARIANTS,
+  CABINET_VARIANTS,
+} from "@/lib/variants";
 
 /* Lazy-load 3D viewer (heavy, client-only) */
 const EggerViewer = dynamic(() => import("@/components/EggerViewer"), {
@@ -23,34 +28,94 @@ const EggerViewer = dynamic(() => import("@/components/EggerViewer"), {
   ),
 });
 
-/* ── Kitchen 2 — test model ──
-  Model: test.glb — 24.0 MB, 1 mesh, no named materials
-  Bounds: ~1.9×1.1×1.9 units
-  Center ≈ [0, 0, 0]
+/* ── Bedroom 3 — test03.glb ──
+  Model: /test/test03.glb — 47.4 MB
+  Materials: 31 named · Meshes: 55 · Textures: 41
+  Center: [5.809, -5.198, 0.135]
+  Size:   24.8 × 41.9 × 8.0 units
 */
-const MODEL_PATH = "/test.glb";
+const MODEL_PATH = "/test/test03.glb";
 
 const ZONES: Zone3DConfig[] = [
   {
-    id: "model",
-    label: "Модель",
+    id: "walls",
+    label: "Стены",
+    icon: "walls",
+    materialNames: ["White Venetian Plaster Wall"],
+    textureRepeat: [4, 4],
+    roughness: 0.85,
+    metalness: 0.0,
+    variants: WALL_VARIANTS,
+  },
+  {
+    id: "wood",
+    label: "Дерево / Мебель",
     icon: "furniture",
-    // Empty name matches unnamed/default materials in test.glb
-    materialNames: [""],
+    materialNames: ["Wood.002", "Furniture Wood", "Wood.001", "Dark_Walnut"],
     textureRepeat: [2, 2],
-    roughness: 0.45,
-    metalness: 0.05,
+    roughness: 0.6,
+    metalness: 0.0,
+    variants: FURNITURE_VARIANTS,
+  },
+  {
+    id: "leather",
+    label: "Кожа / Диван",
+    icon: "furniture",
+    materialNames: ["Leather", "Leather.001"],
+    textureRepeat: [2, 2],
+    roughness: 0.5,
+    metalness: 0.0,
+    variants: CABINET_VARIANTS,
+  },
+  {
+    id: "bedding",
+    label: "Текстиль / Постель",
+    icon: "furniture",
+    materialNames: ["Grey Cloth", "Grey Cloth.001", "Grey Cloth.002"],
+    textureRepeat: [3, 3],
+    roughness: 0.9,
+    metalness: 0.0,
+    variants: FURNITURE_VARIANTS,
+  },
+  {
+    id: "curtains",
+    label: "Шторы",
+    icon: "curtains",
+    materialNames: ["Material.028"],
+    textureRepeat: [2, 3],
+    roughness: 0.8,
+    metalness: 0.0,
+    variants: WALL_VARIANTS,
+  },
+  {
+    id: "carpet",
+    label: "Ковёр / Пол",
+    icon: "floor",
+    materialNames: ["Material.008", "Carpet006.048"],
+    textureRepeat: [3, 3],
+    roughness: 0.95,
+    metalness: 0.0,
+    variants: FLOOR_VARIANTS,
+  },
+  {
+    id: "metal",
+    label: "Металл",
+    icon: "metal",
+    materialNames: ["Inox", "Black Metal"],
+    textureRepeat: [1, 1],
+    roughness: 0.2,
+    metalness: 0.9,
     variants: CABINET_VARIANTS,
   },
 ];
 
-/* Camera: compact model scale */
-const CAMERA_POS: [number, number, number] = [1.0, 0.8, 2.4];
-const CAMERA_TARGET: [number, number, number] = [0, 0, 0];
+/* Camera: same as bedroom-1 (identical model bounds) */
+const CAMERA_POS: [number, number, number] = [18, 8, 12];
+const CAMERA_TARGET: [number, number, number] = [5.8, -5, 0];
 
 /* ═══════════════════════════════════ Page ═══════════════════════════════════ */
 
-export default function Kitchen2Page() {
+export default function Bedroom3Page() {
   const [state, setState] = useState<RoomState>({});
   const [activeZone, setActiveZone] = useState(ZONES[0]?.id || "");
   const [panelOpen, setPanelOpen] = useState(true);
@@ -83,8 +148,8 @@ export default function Kitchen2Page() {
           <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V15m0 0l-2.25 1.313" />
           </svg>
-          <span className="hidden sm:inline">3D Визуализатор кухни 2</span>
-          <span className="sm:hidden">Кухня 2</span>
+          <span className="hidden sm:inline">3D Спальня 3</span>
+          <span className="sm:hidden">Спальня 3</span>
         </h1>
 
         <span className="text-[10px] sm:text-xs text-gray-400 hidden md:inline">
